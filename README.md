@@ -25,6 +25,7 @@ Expert Advisor untuk **eksekusi trading cepat via numpad** pada chart MT5. Attac
 |---------|-------------|-----|
 | **[docs/PENGGUNAAN.md](docs/PENGGUNAAN.md)** | Trader / pengguna EA | Install `.ex5`, attach, hotkey, inputs, troubleshooting |
 | **[docs/COMPILE.md](docs/COMPILE.md)** | Developer | Struktur source, compile MetaEditor, unit test, error compile |
+| **[CHANGELOG.md](CHANGELOG.md)** | Semua | Riwayat versi & perubahan |
 
 **Baru mulai?** → [PENGGUNAAN.md](docs/PENGGUNAAN.md)  
 **Compile dari source?** → [COMPILE.md](docs/COMPILE.md)
