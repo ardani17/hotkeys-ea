@@ -3,7 +3,7 @@
 //+------------------------------------------------------------------+
 #ifndef HK_KEYMAP_MQH
 #define HK_KEYMAP_MQH
-#include "Config.mqh"
+#include <HotkeysEA/Config.mqh>
 
 ENUM_HK_ACTION HK_MapKey(const long key)
 {

@@ -51,19 +51,4 @@ enum ENUM_HK_ACTION
    HK_CLOSE_ALL
 };
 
-input double         InpDefaultLot      = 0.01;         // Default / reset lot
-input double         InpLotStep         = 0.01;         // Lot step for +/-
-input double         InpMaxLot          = 1.00;         // Max lot cap
-input long           InpMagicNumber     = 20260704;     // Magic number filter
-input bool           InpUseSLTP         = true;         // Use SL/TP on entry
-input int            InpStopLossPts     = 200;          // Stop Loss (points)
-input int            InpTakeProfitPts   = 400;          // Take Profit (points)
-input int            InpTrailingPts     = 150;          // Trailing distance (points)
-input int            InpTrailingStep    = 50;           // Trailing step (points)
-input int            InpPendingDistPts  = 100;          // Pending distance (points)
-input ENUM_HK_PENDING InpPendingType    = HK_PENDING_STOP; // Pending type
-input bool           InpConfirmCloseAll = true;         // Confirm before Close All
-input int            InpSlippagePts     = 30;           // Max deviation (points)
-input ENUM_BASE_CORNER InpPanelCorner   = CORNER_LEFT_UPPER; // Panel corner
-
 #endif // HK_CONFIG_MQH

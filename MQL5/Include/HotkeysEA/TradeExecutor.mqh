@@ -4,9 +4,9 @@
 #ifndef HK_TRADEEXECUTOR_MQH
 #define HK_TRADEEXECUTOR_MQH
 #include <Trade/Trade.mqh>
-#include "Config.mqh"
-#include "MathUtils.mqh"
-#include "PositionUtils.mqh"
+#include <HotkeysEA/Config.mqh>
+#include <HotkeysEA/MathUtils.mqh>
+#include <HotkeysEA/PositionUtils.mqh>
 
 class CTradeExecutor
 {
