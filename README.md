@@ -2,9 +2,32 @@
 
 Expert Advisor untuk **eksekusi trading cepat via numpad** pada chart MT5. Attach ke chart, tekan angka di keyboard numpad — buy, sell, atur lot, close posisi, tanpa klik mouse.
 
+[![Release](https://img.shields.io/github/v/release/ardani17/hotkeys-ea?label=release)](https://github.com/ardani17/hotkeys-ea/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-MetaTrader%205-blue)](https://www.metatrader5.com/)
 [![Language](https://img.shields.io/badge/language-MQL5-green)](https://www.mql5.com/)
 [![OS](https://img.shields.io/badge/OS-Windows-lightgrey)](https://www.microsoft.com/windows)
+[![License](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
+
+> **Trade faster, click less.** 16 numpad hotkeys · on-chart panel · spread-aware stops · magic-number scope
+
+---
+
+## Mengapa Hotkeys EA?
+
+Scalping dan manual trading di MT5 sering terhambat klik mouse dan dialog order. Hotkeys EA memberi kontrol penuh dari keyboard numpad — cocok untuk trader yang ingin **eksekusi instan** tanpa mengubah workflow chart.
+
+| | Hotkeys EA | Trading manual MT5 |
+|---|-----------|-------------------|
+| Eksekusi order | 1 tombol numpad | Klik + konfirmasi |
+| Atur lot | `+` / `-` langsung | Edit field order |
+| Close / BE / trailing | Hotkey dedicated | Menu context / modify |
+| Scope posisi | Magic number + symbol | Semua posisi chart |
+
+---
+
+## Download
+
+**[⬇ Latest release (v1.01.0)](https://github.com/ardani17/hotkeys-ea/releases/latest)** — unduh `.ex5` atau compile dari source.
 
 ---
 
@@ -78,9 +101,8 @@ hotkeys-ea/
 
 | Branch | Tujuan |
 |--------|--------|
-| `main` | Release stabil |
-| `development` | Integrasi & testing |
-| `feature/*` | Fitur / fix per branch |
+| `main` | Release stabil (default) |
+| `development` | Integrasi fitur & testing |
 
 ---
 
@@ -95,12 +117,19 @@ hotkeys-ea/
 
 ## Lisensi & disclaimer
 
-Proyek open source untuk keperluan edukasi dan trading pribadi. **Trading forex/crypto berisiko.** Uji di akun demo sebelum live. Penulis tidak bertanggung jawab atas kerugian trading.
+Proyek ini dilisensikan di bawah [MIT License](LICENSE) — bebas dipakai, dimodifikasi, dan didistribusikan.
+
+**Trading forex/crypto berisiko.** Uji di akun demo sebelum live. Penulis tidak bertanggung jawab atas kerugian trading.
 
 ---
 
 ## Kontribusi & issue
 
-- Issues: [github.com/ardani17/hotkeys-ea/issues](https://github.com/ardani17/hotkeys-ea/issues)
-- Spec: [#1 Design Spec](https://github.com/ardani17/hotkeys-ea/issues/1)
-- Plan: [#12 Implementation Plan](https://github.com/ardani17/hotkeys-ea/issues/12)
+Punya ide fitur, bug report, atau ingin berkontribusi? Buka [Issues](https://github.com/ardani17/hotkeys-ea/issues) atau fork repo ini.
+
+| | |
+|---|---|
+| 🐛 Bug / request | [Issues](https://github.com/ardani17/hotkeys-ea/issues/new) |
+| 📋 Design spec | [#1](https://github.com/ardani17/hotkeys-ea/issues/1) |
+| 🗺 Implementation plan | [#12](https://github.com/ardani17/hotkeys-ea/issues/12) |
+| ⭐ Suka project ini? | [Star repo](https://github.com/ardani17/hotkeys-ea) |
