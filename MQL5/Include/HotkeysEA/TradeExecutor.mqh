@@ -23,13 +23,30 @@ private:
    double Point()  { return SymbolInfoDouble(m_symbol, SYMBOL_POINT); }
    int    Digits() { return (int)SymbolInfoInteger(m_symbol, SYMBOL_DIGITS); }
    int    StopsLevel() { return (int)SymbolInfoInteger(m_symbol, SYMBOL_TRADE_STOPS_LEVEL); }
+   int    FreezeLevel() { return (int)SymbolInfoInteger(m_symbol, SYMBOL_TRADE_FREEZE_LEVEL); }
+   int    SpreadPts()  { return (int)SymbolInfoInteger(m_symbol, SYMBOL_SPREAD); }
+
+   // Broker-safe minimum distance (points) for SL/TP or pending orders.
+   // Many symbols (crypto/market execution) report stops level 0, so a SL/TP
+   // tighter than the current spread is rejected as "invalid stops". Guard with
+   // the largest of: stops level, freeze level, and a spread-based buffer.
+   int MinStopPts()
+   {
+      int stopLvl  = StopsLevel();
+      int freezeLvl = FreezeLevel();
+      int spreadBuf = SpreadPts() * 2 + 10; // 2x spread + small cushion
+      int req = stopLvl;
+      if(freezeLvl > req) req = freezeLvl;
+      if(spreadBuf > req) req = spreadBuf;
+      return req;
+   }
 
    // Enforce broker minimum stop distance (points) for an SL/TP offset.
    int NormPts(const int pts)
    {
-      int minLvl = StopsLevel();
-      if(pts > 0 && pts < minLvl) return minLvl;
-      return pts;
+      if(pts <= 0) return 0;
+      int minReq = MinStopPts();
+      return (pts < minReq) ? minReq : pts;
    }
    bool Match()
    {
@@ -54,6 +71,12 @@ public:
    void SetUseSLTP(const bool v) { m_useSLTP = v; }
    bool UseSLTP() const { return m_useSLTP; }
 
+   // Retcode indicating the SL/TP were rejected as invalid/too close.
+   bool IsInvalidStops(const uint retcode)
+   {
+      return (retcode == TRADE_RETCODE_INVALID_STOPS);
+   }
+
    bool OpenMarket(const int dir, const double lot)
    {
       double ask = SymbolInfoDouble(m_symbol, SYMBOL_ASK);
@@ -67,8 +90,21 @@ public:
          if(sl > 0.0) sl = NormalizeDouble(sl, Digits());
          if(tp > 0.0) tp = NormalizeDouble(tp, Digits());
       }
-      if(dir > 0) return m_trade.Buy(lot, m_symbol, 0.0, sl, tp, "hk");
-      return m_trade.Sell(lot, m_symbol, 0.0, sl, tp, "hk");
+
+      bool ok = (dir > 0) ? m_trade.Buy(lot, m_symbol, 0.0, sl, tp, "hk")
+                          : m_trade.Sell(lot, m_symbol, 0.0, sl, tp, "hk");
+
+      // Fallback: if SL/TP were rejected, open the position without them so the
+      // keypress still results in a trade (core function), then warn.
+      if(!ok && m_useSLTP && IsInvalidStops(m_trade.ResultRetcode()))
+      {
+         PrintFormat("HotkeysEA: SL/TP ditolak (invalid stops) — buka tanpa SL/TP. Naikkan InpStopLossPts/InpTakeProfitPts untuk %s.", m_symbol);
+         ok = (dir > 0) ? m_trade.Buy(lot, m_symbol, 0.0, 0.0, 0.0, "hk")
+                        : m_trade.Sell(lot, m_symbol, 0.0, 0.0, 0.0, "hk");
+      }
+      if(!ok)
+         PrintFormat("HotkeysEA: order gagal retcode=%d (%s)", m_trade.ResultRetcode(), m_trade.ResultRetcodeDescription());
+      return ok;
    }
 
    bool CloseAll()
@@ -150,8 +186,8 @@ public:
       double ref  = (dir > 0) ? ask : bid;
       bool   isStop = (m_pendType == HK_PENDING_STOP);
       int    dist   = m_pendDist;
-      int    minLvl = StopsLevel();
-      if(dist < minLvl) dist = minLvl;
+      int    minReq = MinStopPts();
+      if(dist < minReq) dist = minReq;
       double price = HK_CalcPendingPrice(dir > 0, isStop, ref, dist, Point());
       price = NormalizeDouble(price, Digits());
       double sl = 0.0, tp = 0.0;
