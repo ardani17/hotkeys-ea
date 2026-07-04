@@ -44,6 +44,27 @@ void TestKeyMap()
    AssertEqI(HK_MapKey(65), HK_NONE,                "key A -> NONE");
 }
 
+void TestMathUtils()
+{
+   // Clamp: within range snaps to step
+   AssertEqD(HK_ClampLot(0.03, 0.01, 1.00, 0.01), 0.03, 1e-8, "clamp 0.03 stays");
+   AssertEqD(HK_ClampLot(0.005, 0.01, 1.00, 0.01), 0.01, 1e-8, "clamp below min -> min");
+   AssertEqD(HK_ClampLot(5.0, 0.01, 1.00, 0.01), 1.00, 1e-8, "clamp above max -> max");
+   AssertEqD(HK_ClampLot(0.024, 0.01, 1.00, 0.01), 0.02, 1e-8, "clamp rounds to step");
+   AssertEqD(HK_ClampLot(0.13, 0.10, 1.00, 0.10), 0.10, 1e-8, "clamp step 0.10 rounds down");
+   // Entry SL/TP
+   AssertEqD(HK_CalcEntrySL(1, 1.10000, 200, 0.00001), 1.09800, 1e-8, "buy SL below");
+   AssertEqD(HK_CalcEntrySL(-1, 1.10000, 200, 0.00001), 1.10200, 1e-8, "sell SL above");
+   AssertEqD(HK_CalcEntryTP(1, 1.10000, 400, 0.00001), 1.10400, 1e-8, "buy TP above");
+   AssertEqD(HK_CalcEntryTP(-1, 1.10000, 400, 0.00001), 1.09600, 1e-8, "sell TP below");
+   AssertEqD(HK_CalcEntrySL(1, 1.10000, 0, 0.00001), 0.0, 1e-8, "SL disabled -> 0");
+   // Pending prices
+   AssertEqD(HK_CalcPendingPrice(true, true, 1.10000, 100, 0.00001), 1.10100, 1e-8, "buy stop above");
+   AssertEqD(HK_CalcPendingPrice(true, false, 1.10000, 100, 0.00001), 1.09900, 1e-8, "buy limit below");
+   AssertEqD(HK_CalcPendingPrice(false, true, 1.10000, 100, 0.00001), 1.09900, 1e-8, "sell stop below");
+   AssertEqD(HK_CalcPendingPrice(false, false, 1.10000, 100, 0.00001), 1.10100, 1e-8, "sell limit above");
+}
+
 void OnStart()
 {
    g_pass = 0; g_fail = 0;
