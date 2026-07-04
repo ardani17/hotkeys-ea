@@ -1,51 +1,108 @@
-# Hotkeys EA (MetaTrader 5)
+# Hotkeys EA — MetaTrader 5
 
-Numpad quick-execution EA. Attach to a chart, keep NumLock ON, and trade the
-active symbol with one keypress.
+Expert Advisor untuk **eksekusi trading cepat via numpad** pada chart MT5. Attach ke chart, tekan angka di keyboard numpad — buy, sell, atur lot, close posisi, tanpa klik mouse.
 
-## Install
+[![Platform](https://img.shields.io/badge/platform-MetaTrader%205-blue)](https://www.metatrader5.com/)
+[![Language](https://img.shields.io/badge/language-MQL5-green)](https://www.mql5.com/)
+[![OS](https://img.shields.io/badge/OS-Windows-lightgrey)](https://www.microsoft.com/windows)
 
-1. In MT5: File > Open Data Folder.
-2. Copy the repo `MQL5/` contents into the terminal `MQL5/` folder:
-   - `Experts/HotkeysEA/HotkeysEA.mq5`
-   - `Include/HotkeysEA/*.mqh`
-   - `Scripts/HotkeysEA/HotkeysEA_Tests.mq5`
-3. In MetaEditor, compile `HotkeysEA.mq5` (F7).
-4. Enable AutoTrading, drag the EA onto a chart, allow algo trading.
+---
 
-## Hotkeys (NumLock ON)
+## Fitur
 
-| Key | Action |
-|-----|--------|
-| 1 | Buy market |
-| 2 | Sell market |
-| 3 | Close profit only |
-| 4 | Close last position |
-| 5 | Close half (last position) |
-| 6 | Reverse |
-| 7 | Move SL to breakeven |
-| 8 | Toggle trailing stop |
-| 9 | Toggle SL/TP on entry |
-| 0 | Reset lot to default |
-| + | Increase lot |
-| - | Decrease lot |
-| * | Buy pending |
-| / | Sell pending |
-| . (Del) | Delete pending orders |
-| Enter | Close all (2x to confirm) |
+- **16 hotkey numpad** — buy/sell, lot sizing, close variants, reverse, breakeven, trailing, pending orders
+- **NumLock ON atau OFF** — mapping otomatis untuk kedua mode
+- **Panel on-chart** — lot, SL/TP, trailing, P/L, status trading
+- **Magic number filter** — tidak mengganggu trade manual / EA lain
+- **Konfirmasi Close All** — Enter 2× dalam 3 detik (opsional)
+- **Spread-aware SL/TP** — jarak stop disesuaikan spread broker
 
-## Inputs
+---
 
-See `MQL5/Include/HotkeysEA/Config.mqh` for all parameters (lot, SL/TP points,
-trailing, pending type/distance, magic number, panel corner, confirm toggle).
+## Dokumentasi
 
-## Tests
+| Dokumen | Untuk siapa | Isi |
+|---------|-------------|-----|
+| **[docs/PENGGUNAAN.md](docs/PENGGUNAAN.md)** | Trader / pengguna EA | Install `.ex5`, attach, hotkey, inputs, troubleshooting |
+| **[docs/COMPILE.md](docs/COMPILE.md)** | Developer | Struktur source, compile MetaEditor, unit test, error compile |
+| **[docs/superpowers/specs/](docs/superpowers/specs/)** | Tim dev | Design spec |
+| **[docs/superpowers/plans/](docs/superpowers/plans/)** | Tim dev | Implementation plan |
 
-Run `Scripts/HotkeysEA/HotkeysEA_Tests` in MT5 to execute pure-logic unit tests
-(keycode mapping, lot clamping, SL/TP/pending price math). Expected:
-`31 passed, 0 failed`.
+**Baru mulai?** → [PENGGUNAAN.md](docs/PENGGUNAAN.md)  
+**Compile dari source?** → [COMPILE.md](docs/COMPILE.md)
 
-## Scope & Safety
+---
 
-All actions are limited to the active chart symbol and the configured magic
-number, so manual trades and other EAs are never affected.
+## Quick start (pengguna)
+
+1. Salin `HotkeysEA.ex5` ke `MQL5/Experts/HotkeysEA/` *(atau compile dari source — lihat COMPILE.md)*
+2. Nyalakan **Algo Trading** di MT5
+3. Drag **HotkeysEA** ke chart
+4. Centang **Allow Algo Trading** + **Allow DLL imports**
+5. Tekan numpad **`1`** = buy, **`2`** = sell, **`+`/`-`** = lot
+
+Detail lengkap: **[docs/PENGGUNAAN.md](docs/PENGGUNAAN.md)**
+
+---
+
+## Hotkey ringkas
+
+| Key | Aksi | Key | Aksi |
+|-----|------|-----|------|
+| 1 | Buy | 0 | Reset lot |
+| 2 | Sell | + / - | Lot ± |
+| 3 | Close profit | * / / | Pending buy/sell |
+| 4 | Close last | . | Delete pending |
+| 5 | Close half | Enter | Close all |
+| 6 | Reverse | 8 | Toggle trailing |
+| 7 | Breakeven | 9 | Toggle SL/TP |
+
+---
+
+## Struktur repository
+
+```
+hotkeys-ea/
+├── README.md
+├── docs/
+│   ├── COMPILE.md           ← panduan compile (developer)
+│   ├── PENGGUNAAN.md        ← panduan pakai EA (user)
+│   └── superpowers/         ← spec & plan internal
+└── MQL5/
+    ├── Experts/HotkeysEA/HotkeysEA.mq5
+    ├── Include/HotkeysEA/*.mqh
+    └── Scripts/HotkeysEA/HotkeysEA_Tests.mq5
+```
+
+---
+
+## Branch
+
+| Branch | Tujuan |
+|--------|--------|
+| `main` | Release stabil |
+| `development` | Integrasi & testing |
+| `feature/*` | Fitur / fix per branch |
+
+---
+
+## Persyaratan
+
+- Windows + MetaTrader 5
+- Keyboard numpad
+- **Allow DLL imports** (keyboard polling via WinAPI)
+- **Allow Algo Trading**
+
+---
+
+## Lisensi & disclaimer
+
+Proyek open source untuk keperluan edukasi dan trading pribadi. **Trading forex/crypto berisiko.** Uji di akun demo sebelum live. Penulis tidak bertanggung jawab atas kerugian trading.
+
+---
+
+## Kontribusi & issue
+
+- Issues: [github.com/ardani17/hotkeys-ea/issues](https://github.com/ardani17/hotkeys-ea/issues)
+- Spec: [#1 Design Spec](https://github.com/ardani17/hotkeys-ea/issues/1)
+- Plan: [#12 Implementation Plan](https://github.com/ardani17/hotkeys-ea/issues/12)
