@@ -1,9 +1,14 @@
 //+------------------------------------------------------------------+
-//| KeyPoller.mqh - poll TERMINAL_KEYSTATE for hotkey edge detection |
+//| KeyPoller.mqh - poll keyboard via WinAPI GetAsyncKeyState        |
+//| Requires "Allow DLL imports" in the EA/terminal options.         |
 //+------------------------------------------------------------------+
 #ifndef HK_KEYPOLLER_MQH
 #define HK_KEYPOLLER_MQH
 #include <HotkeysEA/KeyMap.mqh>
+
+#import "user32.dll"
+   int GetAsyncKeyState(int vKey);
+#import
 
 class CKeyPoller
 {
@@ -13,7 +18,8 @@ private:
    bool IsDown(const int vk)
    {
       if(vk < 0 || vk > 255) return false;
-      return (TerminalInfoInteger(TERMINAL_KEYSTATE, vk) == 1);
+      // High-order bit (0x8000) set => key currently pressed
+      return ((GetAsyncKeyState(vk) & 0x8000) != 0);
    }
 public:
    void Reset()
