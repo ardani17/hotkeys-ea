@@ -3,7 +3,7 @@
 //+------------------------------------------------------------------+
 #ifndef HK_LOTMANAGER_MQH
 #define HK_LOTMANAGER_MQH
-#include "MathUtils.mqh"
+#include <HotkeysEA/MathUtils.mqh>
 
 class CLotManager
 {

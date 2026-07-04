@@ -42,7 +42,8 @@ public:
    }
 
    void Update(const double lot, const bool useSLTP, const bool trailingOn,
-               const bool confirmPending, const double floatPL, const int posCount)
+               const bool confirmPending, const double floatPL, const int posCount,
+               const string lastKey = "", const bool tradeOk = true)
    {
       SetLabel("title", "== HOTKEYS EA ==", clrWhite, 0);
       SetLabel("lot",   StringFormat("Lot     : %.2f", lot), clrGold, 1);
@@ -55,6 +56,10 @@ public:
                floatPL >= 0 ? clrLime : clrTomato, 5);
       SetLabel("hint",  confirmPending ? ">> ENTER lagi utk CLOSE ALL <<" : "",
                clrYellow, 6);
+      SetLabel("trade", tradeOk ? "Trade   : OK" : "Trade   : BLOCKED (Algo ON?)",
+               tradeOk ? clrLime : clrTomato, 7);
+      SetLabel("last",  lastKey == "" ? "Key     : (tekan numpad)" : "Key     : " + lastKey,
+               clrAqua, 8);
       ChartRedraw(m_chart);
    }
 

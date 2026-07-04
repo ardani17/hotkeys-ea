@@ -22,6 +22,19 @@
 #define HK_VK_DIVIDE     111
 #define HK_VK_RETURN     13
 
+// NumLock OFF — numpad sends navigation key codes instead
+#define HK_VK_NL_END     35   // numpad 1
+#define HK_VK_NL_DOWN    40   // numpad 2
+#define HK_VK_NL_PGDN    34   // numpad 3
+#define HK_VK_NL_LEFT    37   // numpad 4
+#define HK_VK_NL_CLEAR   12   // numpad 5
+#define HK_VK_NL_RIGHT   39   // numpad 6
+#define HK_VK_NL_HOME    36   // numpad 7
+#define HK_VK_NL_UP      38   // numpad 8
+#define HK_VK_NL_PGUP    33   // numpad 9
+#define HK_VK_NL_INS     45   // numpad 0
+#define HK_VK_NL_DEL     46   // numpad .
+
 #define HK_CONFIRM_WINDOW_SEC 3
 
 enum ENUM_HK_PENDING

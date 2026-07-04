@@ -3,7 +3,7 @@
 //+------------------------------------------------------------------+
 #property copyright "ardani17"
 #property link      "https://github.com/ardani17/hotkeys-ea"
-#property version   "1.00"
+#property version   "1.01"
 
 #include <HotkeysEA/Config.mqh>
 
@@ -22,7 +22,10 @@ input ENUM_HK_PENDING  InpPendingType     = HK_PENDING_STOP; // Pending type
 input bool             InpConfirmCloseAll = true;            // Confirm before Close All
 input int              InpSlippagePts     = 30;              // Max deviation (points)
 input ENUM_BASE_CORNER InpPanelCorner     = CORNER_LEFT_UPPER; // Panel corner
+input bool             InpDebugKeys       = false;           // Log key presses to Experts tab
+
 #include <HotkeysEA/KeyMap.mqh>
+#include <HotkeysEA/KeyPoller.mqh>
 #include <HotkeysEA/MathUtils.mqh>
 #include <HotkeysEA/LotManager.mqh>
 #include <HotkeysEA/PositionUtils.mqh>
@@ -37,54 +40,58 @@ CTradeExecutor   g_exec;
 CTrailingManager g_trail;
 CPanel           g_panel;
 CTrade           g_trade;
+CKeyPoller       g_keys;
 
 bool     g_trailingOn   = false;
 bool     g_confirmArmed = false;
 datetime g_confirmTime  = 0;
+string   g_lastKeyLabel = "";
 
-void RefreshPanel();
-
-int OnInit()
+string ActionLabel(const ENUM_HK_ACTION action)
 {
-   g_lot.Init(_Symbol, InpDefaultLot, InpLotStep, InpMaxLot);
-   g_pos.Init(_Symbol, InpMagicNumber);
-   g_exec.Init(_Symbol, InpMagicNumber, InpSlippagePts, InpUseSLTP,
-               InpStopLossPts, InpTakeProfitPts, InpPendingDistPts, InpPendingType);
-   g_trail.Init(_Symbol, InpMagicNumber, InpTrailingPts, InpTrailingStep);
-   g_trade.SetExpertMagicNumber(InpMagicNumber);
-   g_trade.SetDeviationInPoints(InpSlippagePts);
-   g_panel.Create(ChartID(), InpPanelCorner);
-   RefreshPanel();
-   ChartSetInteger(ChartID(), CHART_KEYBOARD_CONTROL, true);
-   return INIT_SUCCEEDED;
+   switch(action)
+   {
+      case HK_BUY:            return "BUY";
+      case HK_SELL:           return "SELL";
+      case HK_CLOSE_PROFIT:   return "CLOSE PROFIT";
+      case HK_CLOSE_LAST:     return "CLOSE LAST";
+      case HK_CLOSE_HALF:     return "CLOSE HALF";
+      case HK_REVERSE:        return "REVERSE";
+      case HK_BREAKEVEN:      return "BREAKEVEN";
+      case HK_TOGGLE_TRAIL:   return "TOGGLE TRAIL";
+      case HK_TOGGLE_SLTP:    return "TOGGLE SL/TP";
+      case HK_RESET_LOT:      return "RESET LOT";
+      case HK_LOT_UP:         return "LOT +";
+      case HK_LOT_DOWN:       return "LOT -";
+      case HK_BUY_PENDING:    return "BUY PENDING";
+      case HK_SELL_PENDING:   return "SELL PENDING";
+      case HK_DELETE_PENDING: return "DEL PENDING";
+      case HK_CLOSE_ALL:      return "CLOSE ALL";
+      default:                return "";
+   }
 }
 
-void OnDeinit(const int reason)
+bool TradeAllowed()
 {
-   g_panel.Destroy();
-}
-
-void OnTick()
-{
-   if(g_confirmArmed && TimeCurrent() - g_confirmTime > HK_CONFIRM_WINDOW_SEC)
-      g_confirmArmed = false;
-   if(g_trailingOn) g_trail.Process(g_trade);
-   RefreshPanel();
+   return (TerminalInfoInteger(TERMINAL_TRADE_ALLOWED) != 0 &&
+           MQLInfoInteger(MQL_TRADE_ALLOWED) != 0);
 }
 
 void RefreshPanel()
 {
    g_panel.Update(g_lot.Current(), g_exec.UseSLTP(), g_trailingOn,
-                  g_confirmArmed, g_pos.TotalProfit(), g_pos.Count());
+                  g_confirmArmed, g_pos.TotalProfit(), g_pos.Count(),
+                  g_lastKeyLabel, TradeAllowed());
 }
 
-void OnChartEvent(const int id, const long &lparam, const double &dparam, const string &sparam)
+void ExecuteAction(const ENUM_HK_ACTION action)
 {
-   if(id != CHARTEVENT_KEYDOWN) return;
-   ENUM_HK_ACTION action = HK_MapKey(lparam);
    if(action == HK_NONE) return;
 
-   // Close-All confirmation window handling
+   g_lastKeyLabel = ActionLabel(action);
+   if(InpDebugKeys)
+      PrintFormat("HotkeysEA: action=%s lot=%.2f", g_lastKeyLabel, g_lot.Current());
+
    if(action == HK_CLOSE_ALL)
    {
       if(InpConfirmCloseAll && !g_confirmArmed)
@@ -99,7 +106,7 @@ void OnChartEvent(const int id, const long &lparam, const double &dparam, const 
       RefreshPanel();
       return;
    }
-   // Any other key cancels a pending confirmation
+
    g_confirmArmed = false;
 
    switch(action)
@@ -124,4 +131,54 @@ void OnChartEvent(const int id, const long &lparam, const double &dparam, const 
    RefreshPanel();
 }
 
-void OnTimer() {}
+int OnInit()
+{
+   g_lot.Init(_Symbol, InpDefaultLot, InpLotStep, InpMaxLot);
+   g_pos.Init(_Symbol, InpMagicNumber);
+   g_exec.Init(_Symbol, InpMagicNumber, InpSlippagePts, InpUseSLTP,
+               InpStopLossPts, InpTakeProfitPts, InpPendingDistPts, InpPendingType);
+   g_trail.Init(_Symbol, InpMagicNumber, InpTrailingPts, InpTrailingStep);
+   g_trade.SetExpertMagicNumber(InpMagicNumber);
+   g_trade.SetDeviationInPoints(InpSlippagePts);
+   g_keys.Reset();
+   g_panel.Create(ChartID(), InpPanelCorner);
+   ChartSetInteger(ChartID(), CHART_KEYBOARD_CONTROL, true);
+   EventSetMillisecondTimer(50);
+   RefreshPanel();
+   Print("HotkeysEA v1.01 ready — numpad polling active (NumLock ON or OFF)");
+   return INIT_SUCCEEDED;
+}
+
+void OnDeinit(const int reason)
+{
+   EventKillTimer();
+   g_panel.Destroy();
+}
+
+void OnTick()
+{
+   if(g_confirmArmed && TimeCurrent() - g_confirmTime > HK_CONFIRM_WINDOW_SEC)
+      g_confirmArmed = false;
+   if(g_trailingOn) g_trail.Process(g_trade);
+   RefreshPanel();
+}
+
+void OnTimer()
+{
+   ENUM_HK_ACTION action = g_keys.Poll();
+   if(action != HK_NONE)
+      ExecuteAction(action);
+}
+
+void OnChartEvent(const int id, const long &lparam, const double &dparam, const string &sparam)
+{
+   if(id != CHARTEVENT_KEYDOWN) return;
+
+   const int vk = HK_ExtractKeyCode(lparam);
+   if(InpDebugKeys)
+      PrintFormat("HotkeysEA: CHARTEVENT_KEYDOWN vk=%d", vk);
+
+   ENUM_HK_ACTION action = HK_MapKey(vk);
+   if(action != HK_NONE)
+      ExecuteAction(action);
+}
